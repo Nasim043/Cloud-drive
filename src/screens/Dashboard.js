@@ -1,30 +1,63 @@
-import React from 'react'
+import { StatusBar } from 'expo-status-bar';
+import React, { useContext } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+
+import Firebase from '../../config/firebase';
+import { AuthenticatedUserContext } from '../../navigation/AuthenticatedUserProvider';
 import Background from '../components/Background'
 import Logo from '../components/Logo'
 import Header from '../components/Header'
 import Paragraph from '../components/Paragraph'
 import Button from '../components/Button'
 
+const auth = Firebase.auth();
 export default function Dashboard({ navigation }) {
+  const { user } = useContext(AuthenticatedUserContext);
+  const handleSignOut = async () => {
+    try {
+      await auth.signOut();
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
-    <Background>
-      <Logo />
-      <Header>Let’s start</Header>
-      <Paragraph>
-        Your amazing app starts here. Open you favorite code editor and start
-        editing this project.
-      </Paragraph>
-      <Button
-        mode="outlined"
-        onPress={() =>
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'StartScreen' }],
-          })
-        }
-      >
-        Logout
-      </Button>
-    </Background>
-  )
+    <View style={styles.container}>
+      <StatusBar style='dark-content' />
+      <View style={styles.row}>
+        <Text style={styles.title}>Welcome {user.email}!</Text>
+        <IconButton
+          name='logout'
+          size={24}
+          color='#fff'
+          onPress={handleSignOut}
+        />
+      </View>
+      <Text style={styles.text}>Your UID is: {user.uid} </Text>
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#e93b81',
+    paddingTop: 50,
+    paddingHorizontal: 12
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#fff'
+  },
+  text: {
+    fontSize: 16,
+    fontWeight: 'normal',
+    color: '#fff'
+  }
+});
